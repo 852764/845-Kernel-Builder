@@ -1,11 +1,11 @@
 [
   {
     "kernelSource": {
-      "name": "Xiaomi_Kernel_OpenSource-sdm845",
-      "repo": "https://github.com/852764/Xiaomi_Kernel_OpenSource-sdm845",
-      "branch": "88-zstd",
-      "device": "dipper",
-      "defconfig": "dipper_user_defconfig"
+      "name": "Xiaomi_Kernel_OpenSource-m9",
+      "repo": "https://github.com/MiCode/Xiaomi_Kernel_OpenSource/",
+      "branch": "cepheus-q-oss",
+      "device": "cepheus",
+      "defconfig": "cepheus_user_defconfig"
     },
     "withKernelSU": true,
     "toolchains": [
