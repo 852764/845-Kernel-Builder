@@ -100,36 +100,38 @@ jobs:
         id: generate-args
         env:
           params: "${{ toJSON(matrix.repos.params) }}"
-          THREAD: $(nproc --all)
         run: |
-          args_array=(-j"${{ env.THREAD }}")
-          
+          THREADS=$(nproc --all)
+          args_array=(-j"$THREADS")
+
+          ARCH=$(echo "$params" | jq -r '.ARCH // empty')
+          KCFLAGS=$(echo "$params" | jq -r '.KCFLAGS // empty')
+          DTC_EXT=$(echo "$params" | jq -r '.DTC_EXT // empty')
+          CC=$(echo "$params" | jq -r '.CC // empty')
+
           if [ -n "${{ env.OUT_DIR }}" ]; then
             mkdir -p "${{ env.OUT_DIR }}"
             args_array+=(O="${{ env.OUT_DIR }}")
           fi
-          
-          if [ -n "$ARCH" ]; then
-            args_array+=(ARCH="$ARCH")
-          fi
-          
-          if [ -n "$KCFLAGS" ]; then
-            args_array+=(KCFLAGS="$KCFLAGS")
-          fi
-          
-          if [ -n "$DTC_EXT" ]; then
-            args_array+=(DTC_EXT="$DTC_EXT")
-          fi
-          
-          if [ -n "$CC" ]; then
-            args_array+=(CC="${{ env.WORKSPACE }}/$CC")
-          fi
-          
+
+          [ -n "$ARCH" ] && args_array+=(ARCH="$ARCH")
+          [ -n "$KCFLAGS" ] && args_array+=(KCFLAGS="$KCFLAGS")
+          [ -n "$DTC_EXT" ] && args_array+=(DTC_EXT="$DTC_EXT")
+          [ -n "$CC" ] && args_array+=(CC="${{ env.WORKSPACE }}/$CC")
+
           while IFS= read -r externalCommand; do
             args_array+=("$externalCommand")
-          done < <(jq -r '.externalCommand | to_entries[] | "\(.key)=${{ env.WORKSPACE }}/\(.value)"' <<< "$params")
+          done < <(jq -r '.externalCommand // {} | to_entries[] | "\(.key)=${{ env.WORKSPACE }}/\(.value)"' <<< "$params")
+
+          args_str=""
+          for arg in "${args_array[@]}"; do
+            printf -v quoted_arg "%q" "$arg"
+            args_str="$args_str $quoted_arg"
+          done
+          args_str="${args_str:1}"
+
           echo "ARCH=$ARCH" >> $GITHUB_OUTPUT
-          echo "args=$args" >> $GITHUB_OUTPUT
+          echo "args=$args_str" >> $GITHUB_OUTPUT
 
       - name: "😋 Update KernelSU"
         working-directory: ${{ env.KERNEL_NAME }}
