@@ -1,4 +1,4 @@
-name: "Build normal kernels"
+name: "Build normal mi9 kernels"
 
 on:
   workflow_dispatch:
