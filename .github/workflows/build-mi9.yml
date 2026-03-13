@@ -114,6 +114,13 @@ jobs:
           if [ -n "$ARCH" ]; then
             args="$args ARCH=$ARCH"
           fi
+          if [ -n "$KCFLAGS" ]; then
+            args="$args KCFLAGS=$KCFLAGS"
+          fi
+          if [ -n "$DTC_EXT" ]; then
+            args="$args DTC_EXT=$DTC_EXT"
+          fi
+          
           if [ -n "$CC" ]; then
             args="$args CC=${{ env.WORKSPACE }}/$CC"
           fi
